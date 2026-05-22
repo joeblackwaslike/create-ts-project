@@ -1,0 +1,8 @@
+{
+  "observed_at": "2026-05-22T01:23:43.588Z",
+  "provider": "claude-code",
+  "event_name": "UserPromptSubmit",
+  "session_id": "94b4cb93-cc18-4286-af09-b8ba37fcfa22",
+  "turn_id": null,
+  "prompt_summary": "use the joe-stack-preferences skill to develop the typescript/node equivalent to /Users/joe/github/joeblackwaslike/cookiecutter-uv\n\nuse degit + a postinstall setup script. i want interactive prompts, …"
+}
