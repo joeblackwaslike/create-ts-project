@@ -1,7 +1,7 @@
 import tseslint from 'typescript-eslint';
 import unicorn from 'eslint-plugin-unicorn';
 import sonarjs from 'eslint-plugin-sonarjs';
-import importX from 'eslint-plugin-import-x';
+import importX, { createNodeResolver } from 'eslint-plugin-import-x';
 import noSecrets from 'eslint-plugin-no-secrets';
 
 export default tseslint.config(
@@ -13,7 +13,11 @@ export default tseslint.config(
   sonarjs.configs.recommended,
 
   importX.flatConfigs.recommended,
-  importX.flatConfigs.typescript,
+  {
+    settings: {
+      'import-x/resolver-next': [createNodeResolver()],
+    },
+  },
 
   {
     plugins: {
