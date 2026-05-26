@@ -69,7 +69,7 @@
     "node": ">=__NODE_VERSION__"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "unrs-resolver"]
+    "onlyBuiltDependencies": ["@biomejs/biome", "core-js", "esbuild", "unrs-resolver"]
   },
   "depcheck": {
     "ignores": ["react", "react-dom", "@docusaurus/types"]
