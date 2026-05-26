@@ -1,24 +1,42 @@
+---
+title: Getting Started
+---
+
 # Getting Started
 
-## Installation
+## 1. Install
 
 ```bash
 pnpm add __PROJECT_NAME__
 ```
 
-## Usage
+## 2. Basic Usage
 
 ```typescript
-import { greet } from '__PROJECT_NAME__';
+import { yourMainExport } from '__PROJECT_NAME__';
 
-console.log(greet('world'));
+// Replace with the simplest real usage example
+const result = yourMainExport({
+  // required options
+});
 ```
 
-## Development
+## 3. Configuration
 
-```bash
-pnpm install    # install dependencies
-pnpm test       # run tests
-pnpm build      # build for production
-pnpm docs:dev   # start docs server
+```typescript
+import { yourMainExport } from '__PROJECT_NAME__';
+
+const result = yourMainExport({
+  // common configuration options
+  option1: 'value',
+  option2: true,
+});
 ```
+
+See the [Configuration reference](./reference/configuration) for all options.
+
+## Next Steps
+
+- [User Guide](./user-guide/) — in-depth feature documentation
+- [API Reference](./api) — auto-generated from TypeScript types
+- [Examples](./examples) — real-world usage patterns
