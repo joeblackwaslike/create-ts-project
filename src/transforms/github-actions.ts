@@ -42,15 +42,15 @@ export async function transformGithubActions(
   }
 
   const ciPath = path.join(githubDir, 'workflows', 'ci.yml');
-  const releasePath = path.join(githubDir, 'workflows', 'release.yml');
+  const releasePleaseYml = path.join(githubDir, 'workflows', 'release-please.yml');
 
   if (!config.publishToNpm) {
-    await fse.remove(releasePath);
+    await editYamlFile(releasePleaseYml, (yaml) => removeJobBlock(yaml, 'publish'));
   }
 
   if (!config.includeDocs) {
     await editYamlFile(ciPath, (yaml) => removeJobBlock(yaml, 'docs'));
-    await editYamlFile(releasePath, (yaml) => removeJobBlock(yaml, 'deploy-docs'));
+    await editYamlFile(releasePleaseYml, (yaml) => removeJobBlock(yaml, 'deploy-docs'));
   }
 
   if (!config.includeCodecov) {
