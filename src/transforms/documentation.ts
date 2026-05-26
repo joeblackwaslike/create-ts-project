@@ -8,7 +8,17 @@ interface PackageJson {
   [key: string]: unknown;
 }
 
-const DOCS_SCRIPTS = ['docs:dev', 'docs:build', 'docs:preview'] as const;
+const DOCS_SCRIPTS = ['docs:start', 'docs:build', 'docs:serve', 'docs:clear'] as const;
+
+const DOCS_DEV_DEPS = [
+  '@docusaurus/core',
+  '@docusaurus/preset-classic',
+  '@docusaurus/types',
+  'docusaurus-plugin-typedoc',
+  'react',
+  'react-dom',
+  'typedoc',
+] as const;
 
 export async function transformDocumentation(
   destDir: string,
@@ -17,6 +27,9 @@ export async function transformDocumentation(
   if (config.includeDocs) return;
 
   await fse.remove(path.join(destDir, 'docs'));
+  await fse.remove(path.join(destDir, 'docusaurus.config.ts'));
+  await fse.remove(path.join(destDir, 'sidebars.ts'));
+  await fse.remove(path.join(destDir, 'static'));
 
   const packagePath = path.join(destDir, 'package.json');
   if (!(await fse.pathExists(packagePath))) return;
@@ -30,7 +43,9 @@ export async function transformDocumentation(
   }
 
   if (packageJson.devDependencies) {
-    Reflect.deleteProperty(packageJson.devDependencies, 'vitepress');
+    for (const dep of DOCS_DEV_DEPS) {
+      Reflect.deleteProperty(packageJson.devDependencies, dep);
+    }
   }
 
   await fse.writeJson(packagePath, packageJson, { spaces: 2 });
