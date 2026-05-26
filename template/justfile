@@ -32,11 +32,19 @@ release: build
 
 # Start docs dev server
 docs:
-  pnpm docs:dev
+  pnpm docs:start
 
 # Build docs
 docs-build:
   pnpm docs:build
+
+# Serve built docs locally
+docs-serve:
+  pnpm docs:serve
+
+# Clear Docusaurus cache
+docs-clear:
+  pnpm docs:clear
 
 # Check for unused dependencies
 deps:
