@@ -35,6 +35,8 @@ const sidebars = {
         'architecture/constitution',
         'architecture/data-model',
         'architecture/project',
+        'architecture/api-layer',
+        'architecture/ui',
         'architecture/quality-checks',
         'architecture/testing-plan',
       ],
