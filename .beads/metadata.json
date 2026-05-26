@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "degit_typescript",
+  "project_id": "d9824a1e-8ebb-4ff6-8260-c51dc6e489e6"
+}
