@@ -14,6 +14,7 @@ const DOCS_DEV_DEPS = [
   '@docusaurus/core',
   '@docusaurus/preset-classic',
   '@docusaurus/types',
+  'docusaurus-plugin-llms',
   'docusaurus-plugin-typedoc',
   'react',
   'react-dom',

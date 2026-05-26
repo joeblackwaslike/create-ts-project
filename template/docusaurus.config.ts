@@ -32,6 +32,13 @@ const config: Config = {
         },
       },
     ],
+    [
+      'docusaurus-plugin-llms',
+      {
+        generateLLMsTxt: true,
+        generateMarkdownFiles: true,
+      },
+    ],
   ],
 
   presets: [
