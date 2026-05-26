@@ -79,3 +79,14 @@ jobs:
       - uses: ./.github/actions/setup-node-env
       - name: Build docs
         run: pnpm docs:build
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
