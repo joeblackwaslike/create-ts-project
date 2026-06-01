@@ -59,8 +59,6 @@ npx create-ts-project my-project
 
 ```bash
 create-ts-project my-project
-# or
-pnpm create ts-project my-project
 ```
 
 The CLI walks through prompts in sequence:
