@@ -1,10 +1,13 @@
+import { exec } from 'node:child_process';
 import { constants, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 import * as clack from '@clack/prompts';
 import fs from 'fs-extra';
 
+const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const TEMPLATE_DIR = path.resolve(__dirname, '..', 'template');
@@ -86,6 +89,26 @@ async function applyCi(dir: string): Promise<void> {
   });
 }
 
+async function applyBeads(dir: string): Promise<void> {
+  try {
+    await execAsync('bd init --skip-agents --non-interactive', { cwd: dir });
+  } catch {
+    // bd not installed; skip silently
+  }
+}
+
+async function applySerena(dir: string): Promise<void> {
+  const package_ = (await fs.readJson(path.join(dir, PKG_FILENAME))) as { name?: string };
+  const slug = (package_.name ?? path.basename(dir)).replaceAll('-', '_');
+  const serenaDir = path.join(dir, '.serena');
+  await fs.ensureDir(serenaDir);
+  await fs.writeFile(
+    path.join(serenaDir, 'project.yml'),
+    `project_name: ${slug}\nlanguages:\n  - typescript\n`,
+    'utf8',
+  );
+}
+
 async function applyVscode(dir: string): Promise<void> {
   const vscodeDir = path.join(dir, '.vscode');
   await fs.ensureDir(vscodeDir);
@@ -104,70 +127,71 @@ async function applyVscode(dir: string): Promise<void> {
   await fs.writeJson(settingsPath, { ...existing, ...biomeSettings }, { spaces: 2 });
 }
 
+async function needsTsconfigUpdate(targetDir: string): Promise<boolean> {
+  const tsconfigPath = path.join(targetDir, 'tsconfig.json');
+  if (!(await pathExists(tsconfigPath))) return false;
+  const tsconfig = (await fs.readJson(tsconfigPath)) as {
+    compilerOptions?: Record<string, unknown>;
+  };
+  const co = tsconfig.compilerOptions ?? {};
+  return co.noUncheckedIndexedAccess !== true || co.exactOptionalPropertyTypes !== true;
+}
+
+async function needsHusky(targetDir: string): Promise<boolean> {
+  const huskyPreCommit = path.join(targetDir, '.husky', 'pre-commit');
+  const packageJson = (await fs.readJson(path.join(targetDir, PKG_FILENAME))) as {
+    scripts?: Record<string, string>;
+    'lint-staged'?: unknown;
+  };
+  return (
+    !(await pathExists(huskyPreCommit)) ||
+    !packageJson['lint-staged'] ||
+    !packageJson.scripts?.prepare
+  );
+}
+
 async function detectAvailableUpdates(targetDir: string): Promise<UpdateOption[]> {
   const options: UpdateOption[] = [];
 
-  if (!(await pathExists(path.join(targetDir, BIOME_FILENAME)))) {
+  if (!(await pathExists(path.join(targetDir, BIOME_FILENAME))))
     options.push({
       value: 'biome',
       label: 'Add Biome config',
       hint: 'copy template biome.json',
       apply: applyBiome,
     });
-  }
 
-  const tsconfigPath = path.join(targetDir, 'tsconfig.json');
-  if (await pathExists(tsconfigPath)) {
-    const tsconfig = (await fs.readJson(tsconfigPath)) as {
-      compilerOptions?: Record<string, unknown>;
-    };
-    const co = tsconfig.compilerOptions ?? {};
-    if (co.noUncheckedIndexedAccess !== true || co.exactOptionalPropertyTypes !== true) {
-      options.push({
-        value: 'tsconfig',
-        label: 'Tighten tsconfig.json',
-        hint: 'add noUncheckedIndexedAccess + exactOptionalPropertyTypes',
-        apply: applyTsconfig,
-      });
-    }
-  }
+  if (await needsTsconfigUpdate(targetDir))
+    options.push({
+      value: 'tsconfig',
+      label: 'Tighten tsconfig.json',
+      hint: 'add noUncheckedIndexedAccess + exactOptionalPropertyTypes',
+      apply: applyTsconfig,
+    });
 
-  if (!(await pathExists(path.join(targetDir, ESLINT_FILENAME)))) {
+  if (!(await pathExists(path.join(targetDir, ESLINT_FILENAME))))
     options.push({
       value: 'eslint',
       label: 'Add ESLint strict config',
       hint: 'copy template eslint.config.mjs',
       apply: applyEslint,
     });
-  }
 
-  const packagePath = path.join(targetDir, PKG_FILENAME);
-  const huskyPreCommit = path.join(targetDir, '.husky', 'pre-commit');
-  const packageJson = (await fs.readJson(packagePath)) as {
-    scripts?: Record<string, string>;
-    'lint-staged'?: unknown;
-  };
-  if (
-    !(await pathExists(huskyPreCommit)) ||
-    !packageJson['lint-staged'] ||
-    !packageJson.scripts?.prepare
-  ) {
+  if (await needsHusky(targetDir))
     options.push({
       value: 'husky',
       label: 'Add Husky + lint-staged',
       hint: 'pre-commit hook with biome + eslint',
       apply: applyHusky,
     });
-  }
 
-  if (!(await pathExists(path.join(targetDir, '.github', 'workflows', 'ci.yml')))) {
+  if (!(await pathExists(path.join(targetDir, '.github', 'workflows', 'ci.yml'))))
     options.push({
       value: 'ci',
       label: 'Add GitHub Actions CI',
       hint: 'copy template ci.yml',
       apply: applyCi,
     });
-  }
 
   options.push({
     value: 'vscode',
@@ -175,6 +199,22 @@ async function detectAvailableUpdates(targetDir: string): Promise<UpdateOption[]
     hint: 'merge .vscode/settings.json',
     apply: applyVscode,
   });
+
+  if (!(await pathExists(path.join(targetDir, '.beads'))))
+    options.push({
+      value: 'beads',
+      label: 'Initialize Beads task manager',
+      hint: 'bd init --skip-agents',
+      apply: applyBeads,
+    });
+
+  if (!(await pathExists(path.join(targetDir, '.serena', 'project.yml'))))
+    options.push({
+      value: 'serena',
+      label: 'Initialize Serena',
+      hint: 'create .serena/project.yml',
+      apply: applySerena,
+    });
 
   return options;
 }

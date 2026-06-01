@@ -1,5 +1,5 @@
 import { exec } from 'node:child_process';
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -15,7 +15,7 @@ import { type ProjectConfig, type TokenMap, toTokenMap } from './types.js';
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const DEGIT_SOURCE = 'joeblackwaslike/degit-typescript/template';
+const DEGIT_SOURCE = 'joeblackwaslike/create-ts-project/template';
 const INSTALL_COMMANDS: Record<ProjectConfig['packageManager'], string> = {
   pnpm: 'pnpm install',
   bun: 'bun install',
@@ -106,6 +106,24 @@ async function installDependencies(
   await execAsync(INSTALL_COMMANDS[packageManager], { cwd: destDir });
 }
 
+async function initializeProjectTools(destDir: string, config: ProjectConfig): Promise<void> {
+  try {
+    await execAsync('bd init --skip-agents --non-interactive', { cwd: destDir });
+    logStep('Initialized Beads task manager');
+  } catch {
+    // bd not installed; skip silently
+  }
+
+  const serenaDir = path.join(destDir, '.serena');
+  await mkdir(serenaDir, { recursive: true });
+  await writeFile(
+    path.join(serenaDir, 'project.yml'),
+    `project_name: ${config.projectSlug}\nlanguages:\n  - typescript\n`,
+    'utf8',
+  );
+  logStep('Initialized Serena project config');
+}
+
 export async function scaffold(destDir: string, config: ProjectConfig): Promise<void> {
   await cloneTemplate(destDir);
   logStep('Cloning template...');
@@ -117,4 +135,5 @@ export async function scaffold(destDir: string, config: ProjectConfig): Promise<
   logStep('Initializing git...');
   await installDependencies(destDir, config.packageManager);
   logStep('Installing dependencies...');
+  await initializeProjectTools(destDir, config);
 }

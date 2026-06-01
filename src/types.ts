@@ -26,7 +26,7 @@ export const projectConfigSchema = z
     projectType: z.enum(['library', 'cli', 'server', 'mcp-server']).default('library'),
     includeGithubActions: z.boolean().default(true),
     publishToNpm: z.boolean().default(false),
-    /** Include a VitePress docs site under `docs/` */
+    /** Include a Docusaurus docs site under `docs/` */
     includeDocs: z.boolean().default(false),
     includeCodecov: z.boolean().default(false),
     includeDockerfile: z.boolean().default(false),
@@ -38,6 +38,12 @@ export const projectConfigSchema = z
   .strict();
 
 export type ProjectConfig = z.infer<typeof projectConfigSchema>;
+
+export const userDefaultsSchema = projectConfigSchema
+  .omit({ projectName: true, projectSlug: true, description: true })
+  .partial();
+
+export type UserDefaults = z.infer<typeof userDefaultsSchema>;
 
 /** Convert a kebab-case identifier to snake_case. */
 export function deriveSlug(name: string): string {

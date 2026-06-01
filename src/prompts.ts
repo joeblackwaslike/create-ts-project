@@ -1,8 +1,29 @@
+import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import path from 'node:path';
 import * as clack from '@clack/prompts';
 
 /* eslint-disable import-x/no-unresolved */
-import { type ProjectConfig, deriveSlug, projectConfigSchema } from './types.js';
+import {
+  type ProjectConfig,
+  type UserDefaults,
+  deriveSlug,
+  projectConfigSchema,
+  userDefaultsSchema,
+} from './types.js';
 /* eslint-enable import-x/no-unresolved */
+
+const RC_PATH = path.join(homedir(), '.create-ts-projectrc.json');
+
+async function loadUserDefaults(): Promise<UserDefaults> {
+  try {
+    const raw = await readFile(RC_PATH, 'utf8');
+    const result = userDefaultsSchema.safeParse(JSON.parse(raw));
+    return result.success ? result.data : {};
+  } catch {
+    return {};
+  }
+}
 
 /** kebab-case identifier: starts with a letter, then letters/digits/hyphens. */
 const KEBAB_CASE = /^[a-z][a-z0-9-]*$/;
@@ -61,7 +82,7 @@ function summarizeFeatures(config: ProjectConfig): string {
   const features: string[] = [];
   if (config.includeGithubActions) features.push('GitHub Actions');
   if (config.publishToNpm) features.push('npm publish');
-  if (config.includeDocs) features.push('VitePress docs');
+  if (config.includeDocs) features.push('Docusaurus docs');
   if (config.includeCodecov) features.push('Codecov');
   if (config.includeDockerfile) features.push('Dockerfile');
   if (config.includeDevcontainer) features.push('devcontainer');
@@ -78,6 +99,8 @@ function summarizeFeatures(config: ProjectConfig): string {
 export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   clack.intro('create-ts-project');
 
+  const d = await loadUserDefaults();
+
   const name = await promptProjectName(projectName);
 
   const description = unwrap(
@@ -90,6 +113,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const author = unwrap(
     await clack.text({
       message: 'Author name?',
+      ...(d.author !== undefined && { initialValue: d.author }),
       validate: (v) => (v ? undefined : 'Author name is required'),
     }),
   );
@@ -97,6 +121,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const email = unwrap(
     await clack.text({
       message: 'Author email?',
+      ...(d.email !== undefined && { initialValue: d.email }),
       validate: validateEmail,
     }),
   );
@@ -105,6 +130,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
     await clack.text({
       message: 'GitHub handle?',
       placeholder: 'octocat',
+      ...(d.githubHandle !== undefined && { initialValue: d.githubHandle }),
       validate: (v) => (v ? undefined : 'GitHub handle is required'),
     }),
   );
@@ -112,7 +138,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const nodeVersion = unwrap(
     await clack.select<'20' | '22' | '23'>({
       message: 'Node version?',
-      initialValue: '22',
+      initialValue: d.nodeVersion ?? '22',
       options: [
         { value: '20', label: '20' },
         { value: '22', label: '22', hint: 'LTS ✓' },
@@ -124,7 +150,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const packageManager = unwrap(
     await clack.select<'pnpm' | 'bun' | 'npm'>({
       message: 'Package manager?',
-      initialValue: 'pnpm',
+      initialValue: d.packageManager ?? 'pnpm',
       options: [
         { value: 'pnpm', label: 'pnpm', hint: 'recommended' },
         { value: 'bun', label: 'bun' },
@@ -136,7 +162,7 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const projectType = unwrap(
     await clack.select<'library' | 'cli' | 'server' | 'mcp-server'>({
       message: 'Project type?',
-      initialValue: 'library',
+      initialValue: d.projectType ?? 'library',
       options: [
         { value: 'library', label: 'library' },
         { value: 'cli', label: 'cli' },
@@ -149,49 +175,49 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   const includeGithubActions = unwrap(
     await clack.confirm({
       message: 'Include GitHub Actions?',
-      initialValue: true,
+      initialValue: d.includeGithubActions ?? true,
     }),
   );
 
   const publishToNpm = unwrap(
     await clack.confirm({
       message: 'Publish to npm?',
-      initialValue: false,
+      initialValue: d.publishToNpm ?? false,
     }),
   );
 
   const includeDocumentation = unwrap(
     await clack.confirm({
-      message: 'Include VitePress docs?',
-      initialValue: false,
+      message: 'Include Docusaurus docs?',
+      initialValue: d.includeDocs ?? false,
     }),
   );
 
   const includeCodecov = unwrap(
     await clack.confirm({
       message: 'Include Codecov?',
-      initialValue: false,
+      initialValue: d.includeCodecov ?? false,
     }),
   );
 
   const includeDockerfile = unwrap(
     await clack.confirm({
       message: 'Include Dockerfile?',
-      initialValue: false,
+      initialValue: d.includeDockerfile ?? false,
     }),
   );
 
   const includeDevcontainer = unwrap(
     await clack.confirm({
       message: 'Include devcontainer?',
-      initialValue: true,
+      initialValue: d.includeDevcontainer ?? true,
     }),
   );
 
   const license = unwrap(
     await clack.select<'MIT' | 'Apache-2.0' | 'BSD-3-Clause' | 'ISC' | 'GPL-3.0' | 'UNLICENSED'>({
       message: 'License?',
-      initialValue: 'MIT',
+      initialValue: d.license ?? 'MIT',
       options: [
         { value: 'MIT', label: 'MIT' },
         { value: 'Apache-2.0', label: 'Apache-2.0' },
