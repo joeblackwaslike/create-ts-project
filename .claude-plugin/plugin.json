@@ -1,0 +1,23 @@
+{
+  "name": "create-ts-project",
+  "version": "0.1.0",
+  "description": "Scaffold and maintain production-ready TypeScript projects — the cookiecutter-uv equivalent for the TypeScript ecosystem",
+  "author": {
+    "name": "Joe Black",
+    "email": "joeblackwaslike@gmail.com",
+    "url": "https://github.com/joeblackwaslike"
+  },
+  "homepage": "https://github.com/joeblackwaslike/create-ts-project",
+  "repository": "https://github.com/joeblackwaslike/create-ts-project",
+  "license": "MIT",
+  "keywords": [
+    "typescript",
+    "scaffold",
+    "cli",
+    "template",
+    "biome",
+    "eslint",
+    "vitest",
+    "docusaurus"
+  ]
+}
