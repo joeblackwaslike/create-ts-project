@@ -90,9 +90,6 @@ zstyle ':omz:plugins:eza' 'header' yes
 zstyle ':omz:plugins:eza' 'icons' yes
 zstyle ':omz:plugins:eza' 'hyperlink' yes
 
-# lazy nvm plugin
-zstyle ':omz:plugins:nvm' lazy yes
-
 # Skip compaudit check - speeds up compinit
 skip_global_compinit=1
 

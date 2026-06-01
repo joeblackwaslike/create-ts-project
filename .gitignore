@@ -15,3 +15,7 @@ node_modules
 
 # Git worktrees
 .worktrees/
+
+# Runtime state
+smoke-output/
+.clawhip/

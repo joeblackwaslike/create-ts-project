@@ -1,7 +1,7 @@
 # Design: GitHub Actions Suite + Docusaurus Docs + Rich README
 
 **Date:** 2026-05-26
-**Project:** `create-ts-project` template (`degit-typescript`)
+**Project:** `create-ts-project`
 **Status:** Approved
 
 ---
