@@ -71,7 +71,7 @@ function replaceTokens(content: string, tokens: TokenMap): string {
   return result;
 }
 
-async function replaceTokensInTree(destDir: string, tokens: TokenMap): Promise<void> {
+export async function replaceTokensInTree(destDir: string, tokens: TokenMap): Promise<void> {
   const files = await globby('**/*', {
     cwd: destDir,
     dot: true,

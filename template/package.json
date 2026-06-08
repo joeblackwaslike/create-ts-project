@@ -23,6 +23,7 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint",
+    "commit": "cz",
     "depcheck": "depcheck",
     "docs:start": "docusaurus start",
     "docs:build": "docusaurus build",
@@ -41,6 +42,10 @@
     "eslint-plugin-no-secrets": "^1.1.2",
     "eslint-plugin-sonarjs": "^3.0.2",
     "eslint-plugin-unicorn": "^56.0.1",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "tsx": "^4.19.2",
@@ -68,6 +73,11 @@
   },
   "engines": {
     "node": ">=__NODE_VERSION__"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "pnpm": {
     "onlyBuiltDependencies": ["@biomejs/biome", "core-js", "esbuild", "unrs-resolver"]

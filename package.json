@@ -18,6 +18,7 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint",
+    "commit": "cz",
     "prepare": "husky",
     "prepublishOnly": "pnpm build"
   },
@@ -31,10 +32,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "@types/degit": "^2.8.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^3.0.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.28.0",
     "eslint-plugin-import-x": "^4.12.2",
     "eslint-plugin-no-secrets": "^1.1.2",
@@ -52,6 +57,11 @@
       "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
     ],
     "src/**/*.ts": ["eslint --fix --max-warnings=0 --no-warn-ignored"]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "engines": {
     "node": ">=22"
