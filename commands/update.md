@@ -1,6 +1,6 @@
 ---
 name: update
-description: Retrofit an existing TypeScript project with current create-ts-project tooling, devcontainer, documentation, and agent infrastructure. Analyzes the target repo and applies only what is missing or outdated.
+description: Retrofit an existing TypeScript project with current spinup-ts tooling, devcontainer, documentation, and agent infrastructure. Analyzes the target repo and applies only what is missing or outdated.
 argument-hint: "[project-path]"
 allowed-tools:
   - Bash
@@ -11,7 +11,7 @@ allowed-tools:
 
 # update — Retrofit Existing TypeScript Project
 
-Apply the full create-ts-project upgrade suite to an existing repo: modern tooling configs, image-based devcontainer, Docusaurus docs, README overhaul, and agent infrastructure. Every phase is independent; the user can skip any.
+Apply the full spinup-ts upgrade suite to an existing repo: modern tooling configs, image-based devcontainer, Docusaurus docs, README overhaul, and agent infrastructure. Every phase is independent; the user can skip any.
 
 ## Step 1 — Resolve Target
 
@@ -77,7 +77,7 @@ If a phase appears up-to-date, confirm before re-running it.
 
 ## Phase A — Tooling
 
-Load the `create-ts-project:create-ts-project` skill for the canonical config content.
+Load the `spinup-ts:spinup-ts` skill for the canonical config content.
 
 ### Biome
 
@@ -289,7 +289,7 @@ Stage and commit all changes:
 ```bash
 cd "$TARGET"
 git add -A
-git commit -m "chore: apply create-ts-project updates"
+git commit -m "chore: apply spinup-ts updates"
 ```
 
 Report a one-line summary per phase: what was added, migrated, or skipped.

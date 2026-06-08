@@ -52,6 +52,15 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['node_modules/**', 'dist/**', 'coverage/**', '*.config.mjs', 'vitest.config.ts'],
+    // Typed ESLint covers `src` only; tests are formatted/linted by Biome and
+    // type-checked by `tsc`/Vitest (keeps `pnpm lint` green out of the box).
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'tests/**',
+      'coverage/**',
+      '*.config.mjs',
+      'vitest.config.ts',
+    ],
   },
 );

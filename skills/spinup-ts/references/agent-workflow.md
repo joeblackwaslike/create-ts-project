@@ -1,15 +1,15 @@
 # Agent Workflow Reference
 
-Detailed guidance for AI agents using `create-ts-project` programmatically.
+Detailed guidance for AI agents using `spinup-ts` programmatically.
 
 ---
 
 ## Constraint: TTY Required
 
-`create-ts-project` uses `@clack/prompts`, which renders interactive UI elements that require a real TTY. Piping stdin does not work:
+`spinup-ts` uses `@clack/prompts`, which renders interactive UI elements that require a real TTY. Piping stdin does not work:
 
 ```bash
-echo "my-description" | create-ts-project my-app  # ❌ does not work
+echo "my-description" | spinup-ts my-app  # ❌ does not work
 ```
 
 Agents must either:
@@ -23,7 +23,7 @@ The RC file approach (option 3) is the recommended pattern.
 
 ## Full RC Schema
 
-`~/.create-ts-projectrc.json` — all fields optional, all map to scaffold prompt defaults:
+`~/.spinup-tsrc.json` — all fields optional, all map to scaffold prompt defaults:
 
 ```typescript
 {
@@ -65,7 +65,7 @@ The RC file approach (option 3) is the recommended pattern.
 
 ```bash
 # 1. Write RC defaults
-cat > ~/.create-ts-projectrc.json << 'EOF'
+cat > ~/.spinup-tsrc.json << 'EOF'
 {
   "author": "Joe Black",
   "email": "joeblackwaslike@gmail.com",
@@ -84,13 +84,13 @@ cat > ~/.create-ts-projectrc.json << 'EOF'
 EOF
 
 # 2. Run CLI (in a TTY session)
-create-ts-project my-library
+spinup-ts my-library
 # Prompts that need manual input: description
 
 # 3. Post-scaffold
 cd my-library
 git init && git add -A
-git commit -m "chore: initial scaffold from create-ts-project"
+git commit -m "chore: initial scaffold from spinup-ts"
 gh repo create joeblackwaslike/my-library --public --source=. --remote=origin --push
 ```
 
@@ -98,31 +98,31 @@ gh repo create joeblackwaslike/my-library --public --source=. --remote=origin --
 
 ```bash
 # Update RC for CLI type
-jq '.projectType = "cli" | .publishToNpm = true' ~/.create-ts-projectrc.json > /tmp/rc.json \
-  && mv /tmp/rc.json ~/.create-ts-projectrc.json
+jq '.projectType = "cli" | .publishToNpm = true' ~/.spinup-tsrc.json > /tmp/rc.json \
+  && mv /tmp/rc.json ~/.spinup-tsrc.json
 
-create-ts-project my-cli
+spinup-ts my-cli
 ```
 
 ### Task: Scaffold an MCP server
 
 ```bash
 jq '.projectType = "mcp-server" | .publishToNpm = false | .includeDocs = false' \
-  ~/.create-ts-projectrc.json > /tmp/rc.json \
-  && mv /tmp/rc.json ~/.create-ts-projectrc.json
+  ~/.spinup-tsrc.json > /tmp/rc.json \
+  && mv /tmp/rc.json ~/.spinup-tsrc.json
 
-create-ts-project my-mcp-server
+spinup-ts my-mcp-server
 ```
 
 ### Task: Retrofit an existing repo
 
 ```bash
 # Run update mode — shows only options missing from the target repo
-create-ts-project --update /path/to/existing-repo
+spinup-ts --update /path/to/existing-repo
 
 # Or from inside the repo:
 cd /path/to/existing-repo
-create-ts-project --update .
+spinup-ts --update .
 ```
 
 The update menu only shows options where the target config file/directory is absent. Safe to run on any repo.
@@ -148,7 +148,7 @@ Then commit and push:
 ```bash
 git init
 git add -A
-git commit -m "chore: initial scaffold from create-ts-project"
+git commit -m "chore: initial scaffold from spinup-ts"
 gh repo create <org>/<name> --public --source=. --remote=origin --push
 ```
 
@@ -165,7 +165,7 @@ For fully headless automation, use `expect` to drive the prompts:
 set project_name [lindex $argv 0]
 set description  [lindex $argv 1]
 
-spawn create-ts-project $project_name
+spawn spinup-ts $project_name
 
 # Project name — pre-filled from arg, just Enter
 expect "Project name"
@@ -199,9 +199,9 @@ expect eof
 
 | Situation | Action |
 |---|---|
-| Empty directory, starting fresh | `create-ts-project <name>` |
-| Existing repo missing Biome, ESLint, CI, etc. | `create-ts-project --update .` |
-| Existing repo with source code, need only CI | `create-ts-project --update .` → select only CI |
+| Empty directory, starting fresh | `spinup-ts <name>` |
+| Existing repo missing Biome, ESLint, CI, etc. | `spinup-ts --update .` |
+| Existing repo with source code, need only CI | `spinup-ts --update .` → select only CI |
 | Repo already has all tooling | Neither — nothing to do |
 
 Never re-scaffold a repo that has existing source code. The scaffold writes to the destination directory, potentially overwriting files.
@@ -230,7 +230,7 @@ The docs site is in a pnpm workspace at `docs/`. The root `pnpm-workspace.yaml` 
 
 | Pitfall | Fix |
 |---|---|
-| Running without an RC file | Write `~/.create-ts-projectrc.json` first |
+| Running without an RC file | Write `~/.spinup-tsrc.json` first |
 | Scaffolding into a non-empty directory | The CLI will warn — confirm intentional overwrite |
 | Forgetting `pnpm install` after scaffold | Always run `pnpm install` before building/testing |
 | `npm link` pointing to old path | Re-run `npm link` from the project root after any folder move |

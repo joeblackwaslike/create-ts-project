@@ -117,10 +117,15 @@ export default tseslint.config(
   },
 
   {
+    // Typed ESLint covers `src` only (matches the lint-staged scope); Biome
+    // formats/lints tests, scripts, and the smoke snapshot.
     ignores: [
       'node_modules/**',
       'dist/**',
       'template/**',
+      'tests/**',
+      'smoke-output/**',
+      'smoke-test.mjs',
       'coverage/**',
       '*.config.mjs',
       'vitest.config.ts',

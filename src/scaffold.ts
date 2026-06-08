@@ -15,7 +15,7 @@ import { type ProjectConfig, type TokenMap, toTokenMap } from './types.js';
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const DEGIT_SOURCE = 'joeblackwaslike/create-ts-project/template';
+const DEGIT_SOURCE = 'joeblackwaslike/spinup-ts/template';
 const INSTALL_COMMANDS: Record<ProjectConfig['packageManager'], string> = {
   pnpm: 'pnpm install',
   bun: 'bun install',
@@ -94,9 +94,12 @@ export async function replaceTokensInTree(destDir: string, tokens: TokenMap): Pr
 async function initGit(destDir: string): Promise<void> {
   await execAsync('git init', { cwd: destDir });
   await execAsync('git add -A', { cwd: destDir });
-  await execAsync('git commit -m "chore: initial scaffold from create-ts-project"', {
-    cwd: destDir,
-  });
+  // Inline identity so the initial commit never depends on the user's global
+  // git config (keeps scaffolding deterministic in CI and fresh environments).
+  await execAsync(
+    'git -c user.name="spinup-ts" -c user.email="spinup-ts@users.noreply.github.com" commit -m "chore: initial scaffold from spinup-ts"',
+    { cwd: destDir },
+  );
 }
 
 async function installDependencies(
@@ -133,7 +136,13 @@ export async function scaffold(destDir: string, config: ProjectConfig): Promise<
   logStep('Applying transforms...');
   await initGit(destDir);
   logStep('Initializing git...');
-  await installDependencies(destDir, config.packageManager);
-  logStep('Installing dependencies...');
+  // SPINUP_TS_SKIP_INSTALL=1 skips the (heavy, network-bound) dependency install
+  // for the generated project — used by the packaged-binary smoke test in CI.
+  if (process.env.SPINUP_TS_SKIP_INSTALL === '1') {
+    logStep('Skipping dependency install (SPINUP_TS_SKIP_INSTALL=1)');
+  } else {
+    await installDependencies(destDir, config.packageManager);
+    logStep('Installing dependencies...');
+  }
   await initializeProjectTools(destDir, config);
 }

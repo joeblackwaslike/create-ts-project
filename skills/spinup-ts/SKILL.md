@@ -1,9 +1,9 @@
 ---
-name: create-ts-project
+name: spinup-ts
 description: >-
   This skill should be used when scaffolding a new TypeScript project, creating
   a TypeScript library, CLI, server, or MCP server from scratch, bootstrapping
-  a new repo with production-ready tooling, using the create-ts-project tool,
+  a new repo with production-ready tooling, using the spinup-ts tool,
   updating an existing TypeScript repo to add Biome, ESLint strict, Vitest,
   Husky, GitHub Actions, Docusaurus, or devcontainer tooling, or when the user
   says "scaffold a TypeScript project", "bootstrap a new repo", "create a new
@@ -11,7 +11,7 @@ description: >-
   or "update my repo with the template tooling".
 ---
 
-# create-ts-project
+# spinup-ts
 
 Scaffold and maintain production-ready TypeScript projects — the `cookiecutter-uv` equivalent for the TypeScript ecosystem.
 
@@ -38,10 +38,10 @@ Every scaffolded project gets an opinionated, pre-integrated stack:
 ### Install from Source (local dev)
 
 ```bash
-git clone https://github.com/joeblackwaslike/create-ts-project
-cd create-ts-project
+git clone https://github.com/joeblackwaslike/spinup-ts
+cd spinup-ts
 pnpm install && pnpm build
-npm link   # makes `create-ts-project` available globally
+npm link   # makes `spinup-ts` available globally
 ```
 
 After any folder move, re-run `npm link` — the symlink stores the absolute path.
@@ -49,8 +49,8 @@ After any folder move, re-run `npm link` — the symlink stores the absolute pat
 ### Run via Package Manager (no install)
 
 ```bash
-pnpm create ts-project my-project
-npx create-ts-project my-project
+pnpm dlx spinup-ts my-project
+npx spinup-ts my-project
 ```
 
 ## Creating a New Project
@@ -58,7 +58,7 @@ npx create-ts-project my-project
 ### Interactive Mode (Human)
 
 ```bash
-create-ts-project my-project
+spinup-ts my-project
 ```
 
 The CLI walks through prompts in sequence:
@@ -81,13 +81,44 @@ The CLI walks through prompts in sequence:
 
 All prompts except name and description can be pre-filled via the user defaults file.
 
-### Agent Mode
+### Agent Mode (non-interactive — preferred)
 
-`create-ts-project` uses `@clack/prompts`, which requires a TTY. Pure stdin piping does not work. For agent workflows:
+The interactive prompts use `@clack/prompts`, which requires a TTY and does not accept
+piped stdin. For agent workflows, use `--non-interactive` (alias `--yes` / `-y`) — it
+scaffolds with defaults only, no prompts, no PTY:
+
+```bash
+spinup-ts my-project --non-interactive
+```
+
+Defaults resolve in order: `~/.spinup-tsrc.json` → local `git config` (author name/email)
+→ built-in fallbacks. Write the RC file first to control the non-default fields:
+
+```json
+{
+  "author": "Joe Black",
+  "email": "joeblackwaslike@gmail.com",
+  "githubHandle": "joeblackwaslike",
+  "nodeVersion": "22",
+  "packageManager": "pnpm",
+  "projectType": "library",
+  "includeGithubActions": true,
+  "publishToNpm": false,
+  "includeDocs": false,
+  "includeCodecov": false,
+  "includeDockerfile": false,
+  "includeDevcontainer": true,
+  "license": "MIT"
+}
+```
+
+### Agent Mode (interactive fallback — TTY)
+
+If you need to override fields per-run, write the RC file and run the CLI in a real TTY:
 
 **Step 1 — Write user defaults.**
 
-Create or update `~/.create-ts-projectrc.json` with all known values before running the CLI:
+Create or update `~/.spinup-tsrc.json` with all known values before running the CLI:
 
 ```json
 {
@@ -112,7 +143,7 @@ With defaults set, only `description` still requires manual input during the run
 **Step 2 — Run via PTY wrapper** (in a shell that has a TTY):
 
 ```bash
-create-ts-project my-project
+spinup-ts my-project
 ```
 
 The CLI will present prompts with the RC values pre-filled. Accept each with `Enter`, or type a custom value. For full automation, use a PTY tool like `expect` or `script`.
@@ -128,12 +159,12 @@ npm link   # if this is a CLI or tool being developed
 
 ## Updating an Existing Project
 
-Add tooling to a repo that was not scaffolded with `create-ts-project`:
+Add tooling to a repo that was not scaffolded with `spinup-ts`:
 
 ```bash
-create-ts-project --update .
+spinup-ts --update .
 # or
-create-ts-project --update /path/to/repo
+spinup-ts --update /path/to/repo
 ```
 
 A multiselect menu shows only the options the target repo is missing:
@@ -153,7 +184,7 @@ Each option is gated: if the target file/directory already exists, the option is
 
 ## User Defaults File
 
-Path: `~/.create-ts-projectrc.json`
+Path: `~/.spinup-tsrc.json`
 
 All fields are optional. Any field set here pre-fills the corresponding prompt. The schema is `ProjectConfig` minus `projectName`, `projectSlug`, and `description` — all fields partial.
 
@@ -223,7 +254,7 @@ Follow `agent-skills:best-practices-for-agentic-development` universal practices
 
 Stop and re-evaluate if:
 
-- Running `create-ts-project` without writing `~/.create-ts-projectrc.json` first — all defaults will be wrong.
+- Running `spinup-ts` without writing `~/.spinup-tsrc.json` first — all defaults will be wrong.
 - Using `--update` on a fresh directory — use the scaffold flow instead.
 - Piping stdin to bypass prompts — `@clack/prompts` requires a real TTY; use `expect` or run interactively.
 - Adding dependencies not in the template without checking `joe-stack-preferences` first.

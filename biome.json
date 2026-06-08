@@ -48,6 +48,21 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "coverage", "template", "*.generated.ts"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "coverage",
+      "template",
+      "smoke-output",
+      "smoke-test.mjs",
+      ".beads",
+      ".claude",
+      ".clawhip",
+      ".serena",
+      ".husky",
+      "*.config.mjs",
+      "*.code-workspace",
+      "*.generated.ts"
+    ]
   }
 }

@@ -1,6 +1,8 @@
+import { exec } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import * as clack from '@clack/prompts';
 
 /* eslint-disable import-x/no-unresolved */
@@ -13,7 +15,9 @@ import {
 } from './types.js';
 /* eslint-enable import-x/no-unresolved */
 
-const RC_PATH = path.join(homedir(), '.create-ts-projectrc.json');
+const execAsync = promisify(exec);
+
+const RC_PATH = path.join(homedir(), '.spinup-tsrc.json');
 
 async function loadUserDefaults(): Promise<UserDefaults> {
   try {
@@ -22,6 +26,16 @@ async function loadUserDefaults(): Promise<UserDefaults> {
     return result.success ? result.data : {};
   } catch {
     return {};
+  }
+}
+
+/** Read a single `git config` value, returning undefined if unset or git is unavailable. */
+async function gitConfigValue(key: string): Promise<string | undefined> {
+  try {
+    const { stdout } = await execAsync(`git config --get ${key}`);
+    return stdout.trim() || undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -97,7 +111,7 @@ function summarizeFeatures(config: ProjectConfig): string {
  */
 // eslint-disable-next-line max-lines-per-function, max-statements
 export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
-  clack.intro('create-ts-project');
+  clack.intro('spinup-ts');
 
   const d = await loadUserDefaults();
 
@@ -270,4 +284,44 @@ export async function runPrompts(projectName?: string): Promise<ProjectConfig> {
   }
 
   return config;
+}
+
+/**
+ * Build a {@link ProjectConfig} from defaults only, with no interactive prompts.
+ *
+ * Resolution order for each field: `~/.spinup-tsrc.json` → local `git config` (author
+ * name/email) → built-in fallback. Mirrors spinup-py's `--non-interactive` / `--yes` mode.
+ *
+ * @param projectName - kebab-case project name (required; validated here).
+ */
+export async function buildDefaultConfig(projectName: string): Promise<ProjectConfig> {
+  const nameError = validateProjectName(projectName);
+  if (nameError) {
+    throw new Error(`Invalid project name "${projectName}": ${nameError}`);
+  }
+
+  const d = await loadUserDefaults();
+  const [gitName, gitEmail] = await Promise.all([
+    gitConfigValue('user.name'),
+    gitConfigValue('user.email'),
+  ]);
+
+  return projectConfigSchema.parse({
+    projectName,
+    projectSlug: deriveSlug(projectName),
+    description: '',
+    author: d.author ?? gitName ?? 'Your Name',
+    email: d.email ?? gitEmail ?? 'you@example.com',
+    githubHandle: d.githubHandle ?? 'your-handle',
+    nodeVersion: d.nodeVersion ?? '22',
+    packageManager: d.packageManager ?? 'pnpm',
+    projectType: d.projectType ?? 'library',
+    includeGithubActions: d.includeGithubActions ?? true,
+    publishToNpm: d.publishToNpm ?? false,
+    includeDocs: d.includeDocs ?? false,
+    includeCodecov: d.includeCodecov ?? false,
+    includeDockerfile: d.includeDockerfile ?? false,
+    includeDevcontainer: d.includeDevcontainer ?? true,
+    license: d.license ?? 'MIT',
+  });
 }

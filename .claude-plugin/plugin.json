@@ -1,14 +1,14 @@
 {
-  "name": "create-ts-project",
+  "name": "spinup-ts",
   "version": "0.1.0",
-  "description": "Scaffold and maintain production-ready TypeScript projects — the cookiecutter-uv equivalent for the TypeScript ecosystem",
+  "description": "Scaffold and maintain production-ready TypeScript projects — the cookiecutter-uv equivalent for the TypeScript ecosystem, sibling of spinup-py",
   "author": {
     "name": "Joe Black",
     "email": "joeblackwaslike@gmail.com",
     "url": "https://github.com/joeblackwaslike"
   },
-  "homepage": "https://github.com/joeblackwaslike/create-ts-project",
-  "repository": "https://github.com/joeblackwaslike/create-ts-project",
+  "homepage": "https://github.com/joeblackwaslike/spinup-ts",
+  "repository": "https://github.com/joeblackwaslike/spinup-ts",
   "license": "MIT",
   "keywords": [
     "typescript",

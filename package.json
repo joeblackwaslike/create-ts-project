@@ -1,12 +1,34 @@
 {
-  "name": "create-ts-project",
+  "name": "spinup-ts",
   "version": "0.1.0",
-  "description": "Scaffold a production-ready TypeScript project with opinionated tooling (Biome, ESLint strict, Vitest, Husky, GitHub Actions, VitePress, Docker, devcontainer)",
+  "description": "Scaffold a production-ready TypeScript project with opinionated tooling (Biome, ESLint strict, Vitest, Husky, GitHub Actions, Docusaurus, Docker, devcontainer). The TypeScript sibling of spinup-py.",
   "type": "module",
   "bin": {
-    "create-ts-project": "./dist/index.js"
+    "spinup-ts": "./dist/index.js"
   },
   "files": ["dist", "template"],
+  "homepage": "https://github.com/joeblackwaslike/spinup-ts#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joeblackwaslike/spinup-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joeblackwaslike/spinup-ts/issues"
+  },
+  "keywords": [
+    "typescript",
+    "scaffold",
+    "cli",
+    "template",
+    "boilerplate",
+    "starter",
+    "biome",
+    "eslint",
+    "vitest",
+    "docusaurus"
+  ],
+  "author": "Joe Black <joeblackwaslike@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",

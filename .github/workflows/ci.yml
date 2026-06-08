@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --run
+
+  pack-smoke:
+    name: Pack tarball · install · run real bin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Pack tarball
+        id: pack
+        run: echo "tarball=$(pnpm pack | tail -n1)" >> "$GITHUB_OUTPUT"
+
+      - name: Install tarball into a clean dir and exercise the binary
+        env:
+          TARBALL: ${{ github.workspace }}/${{ steps.pack.outputs.tarball }}
+        run: |
+          set -euo pipefail
+          WORK="$(mktemp -d)"
+          cd "$WORK"
+          npm init -y >/dev/null
+          npm install "$TARBALL"
+          BIN="$WORK/node_modules/.bin/spinup-ts"
+
+          echo "== spinup-ts --version =="
+          VERSION="$("$BIN" --version)"
+          echo "version: $VERSION"
+          test "$VERSION" = "0.1.0"
+
+          echo "== spinup-ts --help =="
+          "$BIN" --help | grep -q "Usage:"
+          "$BIN" --help | grep -q "non-interactive"
+
+          echo "== spinup-ts smoke-proj --non-interactive =="
+          # NODE_ENV=development -> use the template bundled in the tarball (no network/degit)
+          # SPINUP_TS_SKIP_INSTALL=1 -> skip the generated project's dependency install
+          NODE_ENV=development SPINUP_TS_SKIP_INSTALL=1 "$BIN" smoke-proj --non-interactive
+
+          echo "== assert scaffold output =="
+          test -f smoke-proj/package.json
+          node -e "const p=require('$WORK/smoke-proj/package.json'); if(p.name!=='smoke-proj'){console.error('bad name:',p.name);process.exit(1)} console.log('scaffolded package name OK:',p.name)"
+          test -f smoke-proj/tsconfig.json
+          test -d smoke-proj/src

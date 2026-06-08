@@ -227,7 +227,7 @@ export async function updateProject(targetDir: string): Promise<void> {
     throw new Error(`No package.json found in ${targetDir}`);
   }
 
-  clack.intro('create-ts-project update');
+  clack.intro('spinup-ts update');
 
   const available = await detectAvailableUpdates(targetDir);
 

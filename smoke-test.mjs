@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.join(__dirname, '..', 'create-ts-project-smoke');
+const outDir = path.join(__dirname, '..', 'spinup-ts-smoke');
 
 // Clean previous run
 try { await rm(outDir, { recursive: true }); } catch {}

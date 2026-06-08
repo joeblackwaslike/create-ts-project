@@ -1,16 +1,45 @@
-# create-ts-project
+# spinup-ts
 
-Scaffold a production-ready TypeScript project with opinionated tooling — the TypeScript equivalent of [cookiecutter-uv](https://github.com/joeblackwaslike/cookiecutter-uv).
+Scaffold a production-ready TypeScript project with opinionated tooling — the TypeScript sibling of [spinup-py](https://github.com/joeblackwaslike/spinup-py) and the TypeScript equivalent of [cookiecutter-uv](https://github.com/joeblackwaslike/cookiecutter-uv).
+
+`spinup-ts` ⇄ `spinup-py` share the same CLI schema, so remembering one gives you the other.
 
 ## Usage
 
 ```bash
-# New project
-pnpm create ts-project my-project
+# New project (interactive)
+npx spinup-ts my-project
+# or: pnpm dlx spinup-ts my-project
+# or: bunx spinup-ts my-project
 
-# Retrofit an existing repo
-pnpm create ts-project --update .
+# New project (defaults only, no prompts)
+npx spinup-ts my-project --non-interactive
+
+# Retrofit an existing repo with template tooling
+npx spinup-ts update .
 ```
+
+Install globally if you scaffold often:
+
+```bash
+npm i -g spinup-ts
+spinup-ts my-project
+```
+
+## CLI
+
+```text
+spinup-ts [new] <project-name>     Scaffold a new TypeScript project
+spinup-ts update [dir]             Retrofit an existing repo with template tooling
+spinup-ts --update [dir]           Alias for `update`
+
+  -y, --yes, --non-interactive     Scaffold with defaults only, no prompts (needs <project-name>)
+  -v, --version                    Print version
+  -h, --help                       Show this help
+```
+
+Non-interactive defaults resolve from `~/.spinup-tsrc.json`, then local `git config`
+(author name/email), then built-in fallbacks.
 
 ## What's Included
 
@@ -21,11 +50,12 @@ pnpm create ts-project --update .
 | `wemake-python-styleguide` | ESLint strict (unicorn + sonarjs + import-x) |
 | `mypy --strict` | `tsc --noEmit` + `@typescript-eslint/strictTypeChecked` |
 | `pytest` + `coverage` | `Vitest` + `@vitest/coverage-v8` |
-| `mkdocs-material` | `VitePress` |
+| `mkdocs-material` | `Docusaurus` |
 | `deptry` | `depcheck` |
-| `pre-commit` | `Husky` + `lint-staged` |
+| `pre-commit` | `Husky` + `lint-staged` + `commitlint` |
 | `Makefile` | `justfile` |
 | `tox` (multi-version) | CI matrix over Node 20/22 |
+| `release-please` | `release-please` (`release-type: node`) |
 
 ## Prompt Options
 
@@ -37,7 +67,7 @@ pnpm create ts-project --update .
 - **Project type** — library, cli, server, mcp-server
 - **GitHub Actions** — CI + release workflows
 - **Publish to npm** — with provenance
-- **VitePress docs** — deployed to GitHub Pages on release
+- **Docusaurus docs** — deployed to GitHub Pages on release
 - **Codecov** — coverage reporting
 - **Dockerfile** — multi-stage Node build
 - **Devcontainer** — full Claude Code-optimized environment

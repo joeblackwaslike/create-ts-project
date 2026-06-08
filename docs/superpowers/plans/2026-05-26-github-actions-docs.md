@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Upgrade the `create-ts-project` template with a full GitHub Actions suite (release-please, CodeQL, labeler, stale, dependabot), replace VitePress with Docusaurus 3 + TypeDoc, build out a comprehensive docs structure, and overhaul the README with rich badges.
+**Goal:** Upgrade the `spinup-ts` template with a full GitHub Actions suite (release-please, CodeQL, labeler, stale, dependabot), replace VitePress with Docusaurus 3 + TypeDoc, build out a comprehensive docs structure, and overhaul the README with rich badges.
 
 **Architecture:** All changes live in `template/` (the scaffold source) and `src/transforms/` (TypeScript that conditionally strips files at scaffold time). The smoke test validates the full output chain end-to-end.
 
@@ -1950,12 +1950,12 @@ Expected: exits 0, no TypeScript errors.
 NODE_ENV=development node smoke-test.mjs 2>&1
 ```
 
-Expected: `Smoke test PASSED — output at: /path/to/create-ts-project-smoke`
+Expected: `Smoke test PASSED — output at: /path/to/spinup-ts-smoke`
 
 - [ ] **Step 3: Verify key generated files exist in smoke output**
 
 ```bash
-SMOKE=../create-ts-project-smoke
+SMOKE=../spinup-ts-smoke
 ls $SMOKE/.github/workflows/ | sort
 ```
 
@@ -1997,7 +1997,7 @@ Expected: lines showing `title: 'smoke-test-lib'`, `projectName: 'smoke-test-lib
 - [ ] **Step 4: Install deps and run Docusaurus build in smoke output**
 
 ```bash
-cd ../create-ts-project-smoke && pnpm install 2>&1 | tail -5
+cd ../spinup-ts-smoke && pnpm install 2>&1 | tail -5
 ```
 
 Expected: exits 0, dependencies installed.

@@ -3,62 +3,111 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import * as clack from '@clack/prompts';
 // eslint-disable-next-line import-x/no-unresolved
-import { runPrompts } from './prompts.js';
+import { buildDefaultConfig, runPrompts } from './prompts.js';
 // eslint-disable-next-line import-x/no-unresolved
 import { checkDestinationDir, scaffold } from './scaffold.js';
+import type { ProjectConfig } from './types.js';
 // eslint-disable-next-line import-x/no-unresolved
 import { updateProject } from './update.js';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json') as { version: string };
 
-const HELP_TEXT = `Usage:
-  create-ts-project [project-name]   Scaffold a new TypeScript project
-  create-ts-project --update [dir]   Update an existing repo with template tooling
+const HELP_TEXT = `spinup-ts — scaffold a production-ready TypeScript project (sibling of spinup-py)
+
+Usage:
+  spinup-ts [new] <project-name>     Scaffold a new TypeScript project
+  spinup-ts update [dir]             Retrofit an existing repo with template tooling
+  spinup-ts --update [dir]           Alias for \`update\`
+
+Options:
+  -y, --yes, --non-interactive       Scaffold with defaults only, no prompts (needs <project-name>)
+  -v, --version                      Print version
+  -h, --help                         Show this help
 
 Examples:
-  create-ts-project my-lib
-  create-ts-project --update .
-  create-ts-project --update /path/to/repo
+  spinup-ts my-lib
+  spinup-ts new my-lib
+  spinup-ts my-lib --non-interactive
+  spinup-ts update .
+  spinup-ts --update /path/to/repo
 `;
 
-async function runCreate(projectName?: string): Promise<void> {
+interface ParsedArgs {
+  command: 'new' | 'update';
+  name?: string | undefined;
+  dir?: string | undefined;
+  nonInteractive: boolean;
+  help: boolean;
+  version: boolean;
+}
+
+function parseArgs(argv: string[]): ParsedArgs {
+  const help = argv.includes('--help') || argv.includes('-h');
+  const version = argv.includes('--version') || argv.includes('-v');
+  const nonInteractive =
+    argv.includes('--non-interactive') || argv.includes('--yes') || argv.includes('-y');
+  const updateFlag = argv.includes('--update') || argv.includes('-u');
+  const positionals = argv.filter((a) => !a.startsWith('-'));
+
+  // Subcommand form: `new <name>` / `update [dir]`
+  if (positionals[0] === 'new') {
+    return { command: 'new', name: positionals[1], nonInteractive, help, version };
+  }
+  if (positionals[0] === 'update') {
+    return { command: 'update', dir: positionals[1], nonInteractive, help, version };
+  }
+
+  // Flag form: `--update [dir]`
+  if (updateFlag) {
+    return { command: 'update', dir: positionals[0], nonInteractive, help, version };
+  }
+
+  // Bare form: `spinup-ts <name>`
+  return { command: 'new', name: positionals[0], nonInteractive, help, version };
+}
+
+async function runCreate(projectName: string | undefined, nonInteractive: boolean): Promise<void> {
   const destDir = path.resolve(projectName ?? '.');
   await checkDestinationDir(destDir);
-  const config = await runPrompts(projectName);
+
+  let config: ProjectConfig;
+  if (nonInteractive) {
+    if (!projectName) {
+      throw new Error('A project name is required in non-interactive mode: spinup-ts <name> --yes');
+    }
+    config = await buildDefaultConfig(projectName);
+  } else {
+    config = await runPrompts(projectName);
+  }
+
   await scaffold(destDir, config);
   clack.outro(`Project created at ${destDir}`);
 }
 
 async function runUpdate(targetDir: string): Promise<void> {
-  const resolvedDir = path.resolve(targetDir);
-  await updateProject(resolvedDir);
+  await updateProject(path.resolve(targetDir));
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  const isUpdate = args.includes('--update') || args.includes('-u');
-  const isHelp = args.includes('--help') || args.includes('-h');
-  const isVersion = args.includes('--version') || args.includes('-v');
-  const positionalArgs = args.filter((a) => !a.startsWith('-'));
-  const firstPositional = positionalArgs.find(Boolean);
+  const args = parseArgs(process.argv.slice(2));
 
-  if (isHelp) {
+  if (args.help) {
     process.stdout.write(HELP_TEXT);
     return;
   }
 
-  if (isVersion) {
+  if (args.version) {
     process.stdout.write(`${packageJson.version}\n`);
     return;
   }
 
-  if (isUpdate) {
-    await runUpdate(firstPositional ?? '.');
+  if (args.command === 'update') {
+    await runUpdate(args.dir ?? '.');
     return;
   }
 
-  await runCreate(firstPositional);
+  await runCreate(args.name, args.nonInteractive);
 }
 
 await main().catch((error: unknown) => {

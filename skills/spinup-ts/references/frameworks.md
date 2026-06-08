@@ -1,6 +1,6 @@
 # Framework Reference
 
-Quick reference for every framework bundled in `create-ts-project` scaffolded projects.
+Quick reference for every framework bundled in `spinup-ts` scaffolded projects.
 
 ---
 

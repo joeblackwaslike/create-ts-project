@@ -1,7 +1,7 @@
 # Design: GitHub Actions Suite + Docusaurus Docs + Rich README
 
 **Date:** 2026-05-26
-**Project:** `create-ts-project`
+**Project:** `spinup-ts`
 **Status:** Approved
 
 ---
@@ -237,7 +237,7 @@ This is the squeeze page. Content should:
 - Open with a bold one-liner hook
 - Hit pain point → solution → proof (3 paragraphs max)
 - Feature grid (3-column with icons)
-- Single CTA: `npm create ts-project@latest` in a copyable code block
+- Single CTA: `npx spinup-ts@latest` in a copyable code block
 - Secondary CTA: link to Getting Started
 
 Placeholder content ships in the template with `__PROJECT_NAME__` and `__DESCRIPTION__` tokens. Developers replace it with project-specific copy.

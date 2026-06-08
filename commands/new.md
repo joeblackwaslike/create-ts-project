@@ -22,7 +22,7 @@ Scaffold a new TypeScript project by collecting configuration through chat, then
 
 > One-sentence description of the project?
 
-**Defaults:** Read `~/.create-ts-projectrc.json` if it exists. Use those values as defaults for all remaining fields. Show a one-line summary:
+**Defaults:** Read `~/.spinup-tsrc.json` if it exists. Use those values as defaults for all remaining fields. Show a one-line summary:
 
 > Using RC defaults: pnpm · library · Node 22 · GitHub Actions on · devcontainer on · MIT. Change anything?
 
@@ -58,13 +58,13 @@ Show the full config as a compact table and ask the user to confirm before proce
 **Find the scaffold module:**
 
 ```bash
-CLI_BIN=$(which create-ts-project 2>/dev/null)
+CLI_BIN=$(which spinup-ts 2>/dev/null)
 CLI_REAL=$(python3 -c "import os; print(os.path.realpath('$CLI_BIN'))" 2>/dev/null)
 PKG_ROOT=$(dirname "$(dirname "$CLI_REAL")")
 echo "$PKG_ROOT"
 ```
 
-**Write and run a temp scaffold script** at `/tmp/ctp-scaffold.mjs`, substituting all gathered values:
+**Write and run a temp scaffold script** at `/tmp/spinup-ts-scaffold.mjs`, substituting all gathered values:
 
 ```js
 import { scaffold, checkDestinationDir } from '<PKG_ROOT>/dist/scaffold.js';
@@ -97,7 +97,7 @@ console.log('Scaffold complete.');
 Run it:
 
 ```bash
-node /tmp/ctp-scaffold.mjs && rm /tmp/ctp-scaffold.mjs
+node /tmp/spinup-ts-scaffold.mjs && rm /tmp/spinup-ts-scaffold.mjs
 ```
 
 If the scaffold fails, report the error clearly and stop. Do not proceed to post-scaffold steps.
@@ -109,7 +109,7 @@ Run these in sequence, reporting each step:
 ```bash
 cd <project-name>
 <packageManager> install
-git init && git add -A && git commit -m "chore: initial scaffold from create-ts-project"
+git init && git add -A && git commit -m "chore: initial scaffold from spinup-ts"
 ```
 
 Then ask:

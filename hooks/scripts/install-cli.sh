@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Auto-installs the create-ts-project CLI via npm link if it isn't already on PATH.
+# Auto-installs the spinup-ts CLI via npm link if it isn't already on PATH.
 # Runs as a SessionStart hook — must exit cleanly and output valid JSON.
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
 
 # Nothing to do if the CLI is already reachable
-if command -v create-ts-project &>/dev/null; then
+if command -v spinup-ts &>/dev/null; then
   echo '{"continue":true,"suppressOutput":true}'
   exit 0
 fi
@@ -27,8 +27,8 @@ fi
 # Link — suppress noise, don't fail the session if this errors
 npm link --silent 2>/dev/null || true
 
-if command -v create-ts-project &>/dev/null; then
-  echo '{"continue":true,"suppressOutput":false,"status":"create-ts-project CLI installed via npm link"}'
+if command -v spinup-ts &>/dev/null; then
+  echo '{"continue":true,"suppressOutput":false,"status":"spinup-ts CLI installed via npm link"}'
 else
   echo '{"continue":true,"suppressOutput":true}'
 fi
