@@ -16,13 +16,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['20', '22']
+        # Tool requires Node >=22 (see package.json engines); test the supported range.
+        node: ['22', '24']
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -48,7 +49,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
