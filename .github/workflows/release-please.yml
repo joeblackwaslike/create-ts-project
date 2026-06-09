@@ -46,6 +46,10 @@ jobs:
 
       - run: pnpm build
 
-      - run: pnpm publish --access public --provenance --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # OIDC Trusted Publishing requires a newer npm than Node bundles (>=11.5.1).
+      - run: npm install -g npm@latest
+
+      # Publishes via OIDC Trusted Publishing (id-token: write above) with
+      # provenance — no long-lived NPM_TOKEN. Requires a trusted publisher
+      # configured for `spinup-ts` on npmjs.com (org/repo + this workflow).
+      - run: npm publish --provenance --access public
