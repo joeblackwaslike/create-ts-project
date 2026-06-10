@@ -6,7 +6,7 @@
 # Issue prefix for this repository (used by bd init)
 # If not set, bd init will auto-detect from directory name
 # Example: issue-prefix: "myproject" creates issues like "myproject-1", "myproject-2", etc.
-issue-prefix: "cts"
+issue-prefix: "sp-ts"
 
 # Use no-db mode: JSONL-only, no Dolt database
 # When true, bd will use .beads/issues.jsonl as the source of truth
@@ -52,3 +52,6 @@ issue-prefix: "cts"
 # - linear.api-key
 # - github.org
 # - github.repo
+
+# Use the shared Dolt server (port 3308) for all projects (prevents per-project drift).
+dolt.shared-server: true
