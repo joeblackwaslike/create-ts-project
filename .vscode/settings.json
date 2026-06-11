@@ -1,0 +1,63 @@
+{
+  // ── Formatting: Biome owns format-on-save (mirrors `pnpm format`) ──
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    // Biome: organize imports + its own safe fixes (matches `biome check --write`)
+    "source.organizeImports.biome": "explicit",
+    "quickfix.biome": "explicit",
+    // ESLint: apply its fixes too, since lint runs both (matches `eslint --fix`)
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // Per-language: pin Biome explicitly so a global Prettier default can't win
+  "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[jsonc]": { "editor.defaultFormatter": "biomejs.biome" },
+
+  // ── ESLint: flat config (v9), lint TS/JS only ──
+  "eslint.useFlatConfig": true,
+  "eslint.validate": ["javascript", "typescript"],
+
+  // ── TypeScript: use the repo's TS, not VS Code's bundled version ──
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+
+  // ── Editor hygiene: match biome.json (lf, 2-space, width 100) ──
+  "files.eol": "\n",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [100],
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+
+  // ── Performance: keep generated + tooling dirs out of search/watch/explorer ──
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/smoke-output": true,
+    "**/pnpm-lock.yaml": true,
+    "**/.beads": true,
+    "**/.serena": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.beads/**": true
+  },
+  "files.exclude": {
+    "**/.DS_Store": true
+  },
+
+  // ── pnpm ──
+  "npm.packageManager": "pnpm"
+}
